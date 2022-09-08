@@ -1,0 +1,96 @@
+<html>
+  <body>
+    hello
+    <canvas id="canvas" width="320px" height="320px"></canvas>
+    <video id="video" controls loop width="320px" height="320px"></video>
+    <img src="/iModel-loader.svg" id="svg1"></img>
+  </body>
+  <script>
+    // This example gets a video stream from a canvas on which we will draw
+    // black and white noise, and captures it to a video
+    //
+    // The relevant functions in use are:
+    //
+    // requestAnimationFrame -> to create a render loop (better than setTimeout)
+    // canvas.captureStream -> to get a stream from a canvas
+    // context.getImageData -> to get access to the canvas pixels
+    // URL.createObjectURL -> to create a URL from a stream so we can use it as src
+
+    window.onload = function () {
+          var video = document.getElementById('video');
+          var canvas = document.getElementById('canvas');
+          var width = canvas.width;
+          var height = canvas.height;
+          var capturing = false;
+
+          video.width = width;
+          video.height = height;
+
+          // We need the 2D context to individually manipulate pixel data
+          var ctx = canvas.getContext('2d');
+
+          // Start with a black background
+          ctx.fillStyle = '#000';
+          ctx.fillRect(0, 0, width, height);
+
+          // Since we're continuously accessing and overwriting the pixels
+          // object, we'll request it once and reuse it across calls to draw()
+          // for best performance (we don't need to create ImageData objects
+          // on every frame)
+          var pixels = ctx.getImageData(0, 0, width, height);
+          var data = pixels.data;
+          var numPixels = data.length;
+
+          var stream = canvas.captureStream(15);
+          var recorder = new MediaRecorder(stream);
+
+          recorder.addEventListener('dataavailable', finishCapturing);
+
+          startCapturing();
+          recorder.start();
+
+          setTimeout(function() {
+                recorder.stop();
+              }, 2000);
+
+
+          function startCapturing() {
+                capturing = true;
+                draw();
+              }
+
+
+          function finishCapturing(e) {
+                capturing = false;
+                var videoData = [ e.data ];
+                var blob = new Blob(videoData, { 'type': 'video/webm' });
+                var videoURL = URL.createObjectURL(blob);
+                video.src = videoURL;
+                video.play();
+              }
+
+
+          function draw() {
+                // We don't want to render again if we're not capturing
+                if(capturing) {
+                      requestAnimationFrame(draw);
+                    }
+                addSvg();
+              }
+
+          async function addSvg() {
+                var canvas = document.getElementById('canvas');
+                var ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, 320, 320);
+                var img1 = document.getElementById('svg1');
+                ctx.drawImage(img1, 0, 0, 320, 320);
+                window.img1 = img1;
+                window.ctx = ctx;
+                //document.body.append(img1);
+                //ctx.putImageData(pixels, 0, 0);
+              }
+        };
+  </script>
+</html>
+
