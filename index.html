@@ -1,6 +1,6 @@
 <html>
   <body>
-    hello
+    <a id="link"></a>
     <canvas id="canvas" width="320px" height="320px"></canvas>
     <video id="video" controls loop width="320px" height="320px"></video>
     <img src="iModel-loader.svg" id="svg1"></img>
@@ -41,8 +41,11 @@
           var data = pixels.data;
           var numPixels = data.length;
 
-          var stream = canvas.captureStream(15);
-          var recorder = new MediaRecorder(stream);
+          const FPS = 15;
+          var stream = canvas.captureStream(FPS);
+          var recorder = new MediaRecorder(stream, {
+            videoBitsPerSecond: 2 * 2500000
+          });
 
           recorder.addEventListener('dataavailable', finishCapturing);
 
@@ -78,8 +81,11 @@
                 addSvg();
               }
 
+          var frameCounter = 0;
+
           async function addSvg() {
-                var canvas = document.getElementById('canvas');
+                //var canvas = document.getElementById("canvas");
+                //var link = document.getElementById("link");
                 var ctx = canvas.getContext('2d');
                 ctx.fillStyle = 'white';
                 ctx.fillRect(0, 0, 320, 320);
@@ -87,8 +93,15 @@
                 ctx.drawImage(img1, 0, 0, 320, 320);
                 window.img1 = img1;
                 window.ctx = ctx;
-                //document.body.append(img1);
-                //ctx.putImageData(pixels, 0, 0);
+
+                // HACK: I know the FPS is 15, but this is called at 60fps, so only download every fourth...
+                var imageURL = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream")
+                if (frameCounter % 4 === 0) {
+                        link.setAttribute("download", `frame-${frameCounter}.png`);
+                        link.setAttribute("href", imageURL);
+                        link.click();
+                }
+                frameCounter++;
               }
         };
   </script>
