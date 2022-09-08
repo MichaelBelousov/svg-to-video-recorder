@@ -97,7 +97,8 @@
                 // HACK: I know the FPS is 15, but this is called at 60fps, so only download every fourth...
                 var imageURL = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream")
                 if (frameCounter % 4 === 0) {
-                        link.setAttribute("download", `frame-${frameCounter}.png`);
+                        const realFrame = frameCounter / 4;
+                        link.setAttribute("download", `frame-${realFrame}.png`);
                         link.setAttribute("href", imageURL);
                         link.click();
                 }
