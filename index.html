@@ -1,9 +1,10 @@
 <html>
   <body>
     <a id="link"></a>
-    <canvas id="canvas" width="320px" height="320px"></canvas>
-    <video id="video" controls loop width="320px" height="320px"></video>
-    <img src="iModel-loader.svg" id="svg1"></img>
+    <canvas id="canvas" width="270px" height="312px"></canvas>
+    <video id="video" controls loop width="270pxpx" height="312px"></video>
+    <img src="iModel-loader.svg" id="svg1" height="312px"></img>
+    <object type="image/svg+xml" data="iModel-loader.svg" id="svg2" height="312px"></object>
   </body>
   <script>
     // This example gets a video stream from a canvas on which we will draw
@@ -52,9 +53,10 @@
           startCapturing();
           recorder.start();
 
+          const animTimeMs = 1_000;
           setTimeout(function() {
                 recorder.stop();
-              }, 2000);
+              }, animTimeMs);
 
 
           function startCapturing() {
@@ -66,7 +68,7 @@
           function finishCapturing(e) {
                 capturing = false;
                 var videoData = [ e.data ];
-                var blob = new Blob(videoData, { 'type': 'video/webm' });
+                var blob = new Blob(videoData, { 'type': 'video/mp4' });
                 var videoURL = URL.createObjectURL(blob);
                 video.src = videoURL;
                 video.play();
@@ -88,9 +90,9 @@
                 //var link = document.getElementById("link");
                 var ctx = canvas.getContext('2d');
                 ctx.fillStyle = 'white';
-                ctx.fillRect(0, 0, 320, 320);
+                ctx.fillRect(0, 0, 270, 312);
                 var img1 = document.getElementById('svg1');
-                ctx.drawImage(img1, 0, 0, 320, 320);
+                ctx.drawImage(img1, 0, 0, 270, 312);
                 window.img1 = img1;
                 window.ctx = ctx;
 
